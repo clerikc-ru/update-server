@@ -120,7 +120,7 @@ main() {
         log_info "To enable reboot, uncomment the reboot section in this script"
         
         # === РАЗКОММЕНТИРУЙТЕ ДЛЯ АВТОМАТИЧЕСКОЙ ПЕРЕЗАГРУЗКИ ===
-        # log_warning "Server will reboot in 60 seconds..."
+         log_warning "Server will reboot in 60 seconds..."
          sleep 60
          log_info "Rebooting now..."
          sudo reboot
