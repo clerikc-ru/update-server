@@ -47,11 +47,8 @@ print_header() {
 
 # Функция для выполнения команд с sudo
 run_sudo() {
-    if [ -n "$SUDO_PASSWORD" ]; then
-        echo "$SUDO_PASSWORD" | sudo -S $@
-    else
-        sudo $@
-    fi
+    # Просто выполняем sudo без пароля (так как настроено в visudo)
+    sudo "$@"
 }
 
 
@@ -65,9 +62,9 @@ main() {
 
     # 1. Обновление списка пакетов
     print_header "STEP 1: UPDATING PACKAGE LISTS"
-    log_info "Running: sudo apt update"
+    log_info "Running: apt update"
     
-    if sudo apt update; then
+    if run_sudo apt update; then
         log_success "Package lists updated successfully"
     else
         log_error "Failed to update package lists"
@@ -78,19 +75,19 @@ main() {
     print_header "STEP 2: CHECKING AVAILABLE UPGRADES"
     log_info "Available upgrades:"
     
-    UPGRADABLE=$(apt list --upgradable 2>/dev/null | wc -l)
+    UPGRADABLE=$(run_sudo apt list --upgradable 2>/dev/null | wc -l)
     if [ "$UPGRADABLE" -gt 1 ]; then
         log_info "Found $((UPGRADABLE-1)) packages to upgrade"
-        sudo apt list --upgradable
+        run_sudo apt list --upgradable
     else
         log_success "No packages available for upgrade"
     fi
 
     # 3. Выполнение обновления
     print_header "STEP 3: PERFORMING SYSTEM UPGRADE"
-    log_info "Running: sudo apt upgrade -y"
+    log_info "Running: apt upgrade -y"
     
-    if sudo apt upgrade -y; then
+    if run_sudo apt upgrade -y; then
         log_success "System upgrade completed successfully"
     else
         log_warning "Upgrade completed with warnings"
@@ -100,8 +97,8 @@ main() {
     print_header "STEP 4: CLEANING UP SYSTEM"
     log_info "Removing unnecessary packages..."
     
-    sudo apt autoremove -y
-    sudo apt autoclean
+    run_sudo apt autoremove -y
+    run_sudo apt autoclean
     log_success "System cleanup completed"
 
     # 5. Проверка необходимости перезагрузки
@@ -115,16 +112,10 @@ main() {
             cat /var/run/reboot-required.pkgs
         fi
         
-        # ЗАКОММЕНТИРОВАННАЯ перезагрузка
-        log_warning "AUTO-REBOOT IS DISABLED FOR SAFETY"
-        log_info "To enable reboot, uncomment the reboot section in this script"
-        
-        
-         log_warning "Server will reboot in 60 seconds..."
-         sleep 60
-         log_info "Rebooting now..."
-         sudo reboot
-        # === РАЗКОММЕНТИРУЙ ДЛЯ АВТОМАТИЧЕСКОЙ ПЕРЕЗАГРУЗКИ (или закоментируй начиная перед log_warning)===
+        log_warning "Server will reboot in 30 seconds..."
+        sleep 30
+        log_info "Rebooting now..."
+        run_sudo reboot
         
     else
         log_success "No reboot required - all updates applied successfully"
@@ -153,7 +144,7 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo "Options:"
             echo "  -t, --tag TAG_NAME    Set the deployment tag name"
-            echo "  -h, --help           Show this help message"
+            echo "  "  -h, --help           Show this help message"
             exit 0
             ;;
         *)
