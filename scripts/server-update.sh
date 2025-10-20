@@ -44,6 +44,17 @@ print_header() {
 # ОСНОВНАЯ ЛОГИКА ОБНОВЛЕНИЯ
 # ==========================================
 
+
+# Функция для выполнения команд с sudo
+run_sudo() {
+    if [ -n "$SUDO_PASSWORD" ]; then
+        echo "$SUDO_PASSWORD" | sudo -S $@
+    else
+        sudo $@
+    fi
+}
+
+
 main() {
     print_header "STARTING SERVER UPDATE PROCESS"
     
