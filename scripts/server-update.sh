@@ -121,9 +121,9 @@ main() {
         
         # === РАЗКОММЕНТИРУЙТЕ ДЛЯ АВТОМАТИЧЕСКОЙ ПЕРЕЗАГРУЗКИ ===
         # log_warning "Server will reboot in 60 seconds..."
-        # sleep 60
-        # log_info "Rebooting now..."
-        # sudo reboot
+         sleep 60
+         log_info "Rebooting now..."
+         sudo reboot
         # =========================================================
         
     else
