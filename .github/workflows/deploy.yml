@@ -1,0 +1,59 @@
+name: 🚀 Deploy Server Updates
+
+on:
+  push:
+    tags:
+      - 'update-*'    # update-2024-01-15, update-security
+      - 'v*'          # v1.0.0, v2.1.3
+      - 'upgrade-*'   # upgrade-emergency
+
+jobs:
+  deploy-and-update:
+    runs-on: ubuntu-latest
+    name: 📦 Deploy and Execute Update Script
+    
+    steps:
+    # Шаг 1: Получаем код
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # Шаг 2: Информация о деплое
+    - name: ℹ️ Display deployment info
+      run: |
+        echo "=========================================="
+        echo "🎯 DEPLOYMENT TRIGGERED"
+        echo "=========================================="
+        echo "📌 Tag: ${{ github.ref_name }}"
+        echo "👤 User: ${{ github.actor }}"
+        echo "📁 Repo: ${{ github.repository }}"
+        echo "🕐 Time: $(date)"
+        echo "=========================================="
+
+    # Шаг 3: Деплой и выполнение скрипта
+    - name: ⚡ Deploy and run update script
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          echo "🚀 Starting deployment process..."
+          
+          # Переходим в папку проекта
+          cd /home/${{ secrets.SERVER_USER }}/update-server
+          
+          # Обновляем код до последней версии
+          echo "📥 Updating repository code..."
+          git fetch --tags
+          git reset --hard ${{ github.ref }}
+          
+          # Делаем скрипт исполняемым
+          chmod +x scripts/server-update.sh
+          
+          # Запускаем скрипт обновления с передачей тега
+          echo "🔧 Executing update script..."
+          ./scripts/server-update.sh --tag "${{ github.ref_name }}"
+          
+          echo "🎉 Deployment and update completed successfully!"
