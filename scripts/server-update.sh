@@ -44,13 +44,15 @@ print_header() {
 # ОСНОВНАЯ ЛОГИКА ОБНОВЛЕНИЯ
 # ==========================================
 
-
 # Функция для выполнения команд с sudo
 run_sudo() {
-    # Просто выполняем sudo без пароля (так как настроено в visudo)
-    sudo "$@"
+    # Используем -S для чтения пароля из stdin
+    if [ -n "$SUDO_PASSWORD" ]; then
+        echo "$SUDO_PASSWORD" | sudo -S "$@"
+    else
+        sudo "$@"
+    fi
 }
-
 
 main() {
     print_header "STARTING SERVER UPDATE PROCESS"
@@ -144,7 +146,7 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo "Options:"
             echo "  -t, --tag TAG_NAME    Set the deployment tag name"
-            echo "  "  -h, --help           Show this help message"
+            echo "  -h, --help           Show this help message"
             exit 0
             ;;
         *)
