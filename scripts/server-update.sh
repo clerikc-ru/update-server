@@ -119,12 +119,12 @@ main() {
         log_warning "AUTO-REBOOT IS DISABLED FOR SAFETY"
         log_info "To enable reboot, uncomment the reboot section in this script"
         
-        # === РАЗКОММЕНТИРУЙТЕ ДЛЯ АВТОМАТИЧЕСКОЙ ПЕРЕЗАГРУЗКИ ===
+        
          log_warning "Server will reboot in 60 seconds..."
          sleep 60
          log_info "Rebooting now..."
          sudo reboot
-        # =========================================================
+        # === РАЗКОММЕНТИРУЙ ДЛЯ АВТОМАТИЧЕСКОЙ ПЕРЕЗАГРУЗКИ (или закоментируй начиная перед log_warning)===
         
     else
         log_success "No reboot required - all updates applied successfully"
